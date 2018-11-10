@@ -16,7 +16,7 @@ import pickle
 from preprocess import load_train_data, load_test_data
 
 ConfP3 = {'model_class': FaceNetP3, 'epochs': 600, 'learning_rate': 1e-4, 'suffix': '600_epochs_P3'}
-ConfP4 = {'model_class': FaceNetP4, 'epochs': 50, 'learning_rate': 1e-4, 'suffix': '150_epochs_P4'}
+ConfP4 = {'model_class': FaceNetP4, 'epochs': 150, 'learning_rate': 1e-4, 'suffix': '150_epochs_P4'}
 
 CONFIGURATION = ConfP4
 
@@ -36,9 +36,9 @@ MAX_EPOCHS = CONFIGURATION['epochs']
 
 PIXEL_MAX_VAL = 255.0
 COORDINATE_MAX_VAL = 96.0
-NUM_EXAMPLES_TO_SHOW = 10
+NUM_EXAMPLES_TO_SHOW = 20
 
-TEST_IMAGES = ['face_example.png']
+TEST_IMAGES = ['test2.jpg']
 
 model = CONFIGURATION['model_class']()
 
@@ -78,9 +78,9 @@ if TRAIN:
     start_time = time.time()
     train_losses = []
     test_losses = []
-    with open(LOG_CSV_FILENAME, 'a') as log_csv_file:
+    with open(LOG_CSV_FILENAME, 'w',newline='') as log_csv_file:
         field_names = ['EPOCH', 'TRAIN_LOSS', 'TEST_LOSS']
-        csv_writer = csv.writer(log_csv_file)
+        csv_writer = csv.writer(log_csv_file, delimiter=',')
         csv_writer.writerow(field_names)
 
     for epoch in range(MAX_EPOCHS):
@@ -113,11 +113,11 @@ if TRAIN:
         test_loss = test_loss.data[0]
         test_losses.append(test_loss)
 
-        print('@@@ train loss=' + str(train_loss) + '  @@@ test loss=' + str(test_loss))
+        print('@@@ train loss=' + str(float(train_loss)) + '  @@@ test loss=' + str(float(test_loss)))
 
-        with open(LOG_CSV_FILENAME, 'a') as log_csv_file:
-            csv_writer = csv.writer(log_csv_file)
-            csv_writer.writerow([str(epoch), str(train_loss), str(test_loss)])
+        with open(LOG_CSV_FILENAME, 'a',newline='') as log_csv_file:
+            csv_writer = csv.writer(log_csv_file, delimiter=',')
+            csv_writer.writerow([str(epoch), str(float(train_loss)), str(float(test_loss))])
 
     end_time = time.time()
     print('---------------------------------------------------------')
@@ -156,7 +156,7 @@ else:
         img_tensor = torch.FloatTensor(img_data)
         img_tensor = img_tensor.view(1, 1, 96, 96)
 
-        output = model(Variable(img_tensor))
+        output = model(img_tensor)
         output = output.data[0].numpy()
         output = output * 48.0 + 48.0
 
