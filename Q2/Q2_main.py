@@ -66,7 +66,7 @@ model = torch.nn.Sequential(
 )
 
 # define loss function
-loss_fn = torch.nn.NLLLoss(size_average=False)
+loss_fn = torch.nn.NLLLoss(size_average=True)
 
 # define optimizer
 test_threshold = 1e-3

@@ -43,6 +43,7 @@ TEST_IMAGES = ['test2.jpg']
 model = CONFIGURATION['model_class']()
 
 loss_fn = torch.nn.MSELoss(size_average=True)
+
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
 
@@ -60,19 +61,18 @@ def plot_image_and_predictions(img, predictions):
 
 if TRAIN:
     # load data
-    X, y = load_train_data(TRAIN_FILENAME)
+    x, y = load_train_data(TRAIN_FILENAME)
 
     # split to test/set
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SET_PROPORTION, shuffle=True, random_state=42)
+    x_train, X_test, y_train, y_test = train_test_split(x, y, test_size=TEST_SET_PROPORTION, shuffle=True, random_state=42)
 
     # wrap in tensors & variables
-    X_train, y_train = torch.FloatTensor(X_train), torch.FloatTensor(y_train)
-    X_train_var, y_train_var = Variable(X_train), Variable(y_train)
+    x_train, y_train = torch.FloatTensor(x_train), torch.FloatTensor(y_train)
     X_test_var, y_test_var = Variable(torch.FloatTensor(X_test)), Variable(torch.FloatTensor(y_test))
     TEST_SET_SIZE = len(X_test)
 
     # init dataloader
-    train_dataset = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(X_train, y_train), shuffle=True, batch_size=BATCH_SIZE)
+    train_dataset = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(x_train, y_train), shuffle=True, batch_size=BATCH_SIZE)
 
     # main loop
     start_time = time.time()
@@ -87,7 +87,7 @@ if TRAIN:
         batch_loss_accumulator = 0
         last_batch = 0
         for batch_idx, (batch_x, batch_y) in enumerate(train_dataset):
-            batch_x, batch_y = Variable(batch_x), Variable(batch_y)
+            batch_x, batch_y = Variable(batch_x), Variable(batch_y, requires_grad=False)
             last_batch = batch_idx
             # predict
             output = model(batch_x)
