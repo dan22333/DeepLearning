@@ -46,7 +46,7 @@ for t in range(epochs):
     y_pred = model(x)
 
     # calculate and print loss
-    loss = loss_fn(y_pred, y)
+    loss = loss_fn(y_pred,y.view(4,1))
     if t % train_prints_interval == 0:
         print('EPOCH = ' + str(t) + ' LOSS=' + str(loss.data[0]))
 
@@ -66,8 +66,8 @@ correct_examples = 0
 
 for i in range(num_of_train_examples):
     prediction = model(x[i])
-    print('Prediction on ' + str(round(x[i].data[0])) + ',' + str(round(x[i].data[1])) + ' = ' + str(round(prediction.data[0])))
-    if abs(training_y[i] - prediction.data[0]) < test_threshold:
+    print('Prediction on ' + str(round(float(x[i].data[0]))) + ',' + str(round(float(x[i].data[1]))) + ' = ' + str(round(float(prediction.data[0]))))
+    if abs(round(float(training_y[i])) - round(float(prediction.data[0]))) < test_threshold:
         correct_examples += 1
         print('\tCorrect!')
     else:

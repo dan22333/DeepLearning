@@ -16,12 +16,12 @@ import pickle
 from preprocess import load_train_data, load_test_data
 
 ConfP3 = {'model_class': FaceNetP3, 'epochs': 600, 'learning_rate': 1e-4, 'suffix': '600_epochs_P3'}
-ConfP4 = {'model_class': FaceNetP4, 'epochs': 150, 'learning_rate': 1e-4, 'suffix': '150_epochs_P4'}
+ConfP4 = {'model_class': FaceNetP4, 'epochs': 50, 'learning_rate': 1e-4, 'suffix': '150_epochs_P4'}
 
 CONFIGURATION = ConfP4
 
-TRAIN = False
-TEST_ON_REAL_IMAGES = True
+TRAIN = True
+TEST_ON_REAL_IMAGES = False
 
 TRAIN_FILENAME = os.path.join('data', 'training.csv')
 TEST_FILENAME = os.path.join('data', 'test.csv')
@@ -36,8 +36,9 @@ MAX_EPOCHS = CONFIGURATION['epochs']
 
 PIXEL_MAX_VAL = 255.0
 COORDINATE_MAX_VAL = 96.0
+NUM_EXAMPLES_TO_SHOW = 10
 
-TEST_IMAGES = ['my_face_bw.png']
+TEST_IMAGES = ['face_example.png']
 
 model = CONFIGURATION['model_class']()
 
@@ -139,11 +140,11 @@ else:
         model = pickle.load(f)
     if not TEST_ON_REAL_IMAGES:
         test_images = load_test_data(TEST_FILENAME)
-        for i in range(10):
+        for i in range(NUM_EXAMPLES_TO_SHOW):
             image = test_images[i][0]
             img_tensor = torch.FloatTensor(image)
             img_tensor = img_tensor.view(1, 1, 96, 96)
-            output = model(Variable(img_tensor))
+            output = model(img_tensor)
             output = output.data[0].numpy()
             output = (output * 48.0) + 48.0
             plot_image_and_predictions(image, output)
@@ -160,41 +161,5 @@ else:
         output = output * 48.0 + 48.0
 
         plot_image_and_predictions(img_data, output)
-
-
-
-def test_on_real_images():
-    # load model
-    model.load_state_dict(torch.load(MODEL_FILENAME))
-
-    # load test images
-    images = []
-    predictions = []
-    for image_file in TEST_IMAGES:
-        img = Image.open(image_file).convert('L')
-        img = img.resize([96,96], Image.ANTIALIAS)
-        img_data = np.asarray(img.getdata()).reshape(img.size)
-        img_data = img_data / float(PIXEL_MAX_VAL)  # normalize to 0..1
-        img_tensor = torch.FloatTensor(img_data)
-        img_tensor = img_tensor.view(1, 1, 96, 96)
-
-        images.append(img_data)
-
-        output = model(Variable(img_tensor))
-        output = output.data[0].numpy()
-        output = output * 48.0 + 48.0
-
-        predictions.append(output)
-
-    for idx, image in enumerate(images):
-        plt.figure()
-        plt.imshow(image, cmap='gray')
-        img_predictions = predictions[idx]
-        for coord in range(0, 30, 2):
-            plt.plot(img_predictions[coord], img_predictions[coord+1], 'o')
-
-        plt.show()
-
-
 
 print('Done.')

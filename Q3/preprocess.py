@@ -34,8 +34,6 @@ def load_train_data(filename, load_only_full_samples=True):
 
     return data_x, data_y
 
-
-
 def load_test_data(filename, limit=None):
     PIXEL_MAX_VAL = 255.0
     data = []

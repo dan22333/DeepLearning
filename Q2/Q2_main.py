@@ -42,9 +42,6 @@ class FlowerDataset(Dataset):
         sample_x = self.flowers.ix[idx, :3].as_matrix().astype('float')
         types = {'Iris-setosa':0,'Iris-versicolor':1,'Iris-virginica':2}
         sample_y = types[self.flowers.ix[idx, 4]]
-        if self.transform:
-            sample = self.transform(sample)
-
         return sample_x,sample_y
 
 # batch size
